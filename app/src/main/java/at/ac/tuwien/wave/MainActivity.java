@@ -12,5 +12,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Vosk vosk = new Vosk();
+        AndroidSTT androidSTT = new AndroidSTT();
+        Wav2Vec2 wav2Vec2 = new Wav2Vec2();
     }
 }
