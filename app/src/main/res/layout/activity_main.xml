@@ -6,13 +6,59 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
+    <Button
+        android:id="@+id/VoskRec"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello wave!"
+        android:layout_marginBottom="25dp"
+        android:text="@string/VoskRec_ButtonName"
+        app:layout_constraintBottom_toTopOf="@+id/Wav2vec2Rec"
+        app:layout_constraintEnd_toStartOf="@+id/DeepspeechRec"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/Wav2vec2Rec"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="80dp"
+        android:text="@string/Wav2vec2Rec_ButtonName"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/AndroidRec"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/DeepspeechRec"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
+        android:text="@string/DeepspeechRec_ButtonName"
+        app:layout_constraintBottom_toTopOf="@+id/AndroidRec"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/VoskRec" />
+
+    <Button
+        android:id="@+id/AndroidRec"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="80dp"
+        android:text="@string/AndroidRec_ButtonName"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/Wav2vec2Rec" />
+
+    <TextView
+        android:id="@+id/ResultText"
+        android:layout_width="307dp"
+        android:layout_height="415dp"
+        android:hint="@string/RecResult_default"
+        app:layout_constraintBottom_toTopOf="@+id/DeepspeechRec"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">wave</string>
+    <string name="RecResult_default">Your recorded text will appear here:</string>
+    <string name="AndroidRec_ButtonName">Android</string>
+    <string name="DeepspeechRec_ButtonName">Deepspeech</string>
+    <string name="Wav2vec2Rec_ButtonName">Wav2vec2</string>
+    <string name="VoskRec_ButtonName">Vosk</string>
+    <string name="permission_message">Wave needs permission to access the microphone, otherwise
+        voice input will not be possible. You can give Wave permission to access the microphone by
+        going to your Settings -> Search for "Microphone" -> Allow for Wave</string>
 </resources>

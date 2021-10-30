@@ -1,11 +1,13 @@
 package at.ac.tuwien.wave;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
+import android.widget.TextView;
 
 public class AndroidSTT implements RecognitionListener {
 
-    public AndroidSTT () {
+    public AndroidSTT (Context context, TextView resultText) {
 
     }
 
