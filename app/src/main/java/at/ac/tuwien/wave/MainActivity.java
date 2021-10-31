@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void setupSystems(TextView resultText) {
         vosk = new Vosk(this, resultText);
-        wav2Vec2 = new Wav2Vec2(this, resultText);
+        wav2Vec2 = new Wav2Vec2(this, resultText, debugText);
         deepspeech = new Deepspeech(this, resultText);
         androidSTT = new AndroidSTT(this, resultText);
     }
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.Wav2vec2Rec).setOnClickListener(v -> {
             if (permissionIsGranted) {
-                // record Audio and print to ResultView
+                wav2Vec2.recognizeMicrophone();
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
             }

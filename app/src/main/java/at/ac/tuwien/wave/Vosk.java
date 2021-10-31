@@ -135,18 +135,6 @@ public class Vosk implements RecognitionListener {
     }
 
     /**
-     * Used to pause and un-pause the recording.
-     *
-     * @Author: Team at Vosk
-     * @Source: @Source: <a href="https://github.com/alphacep/vosk-android-demo">vosk-android-demo on Github</a> (2021-10-29)
-     */
-    private void pause(boolean checked) {
-        if (speechService != null) {
-            speechService.setPause(checked);
-        }
-    }
-
-    /**
      * For properly ending the app.
      *
      * @Author: Team at Vosk

@@ -6,5 +6,6 @@
     <string name="Wav2vec2Rec_ButtonName">Wav2vec2</string>
     <string name="VoskRec_ButtonName">Vosk</string>
     <string name="DebugText_default">Click a button to activate a system…</string>
-    <string name="Vosk_listening">Vosk is listening...</string>
+    <string name="Vosk_listening">Vosk is listening…</string>
+    <string name="DebugText_Recognizing">Recognizing…</string>
 </resources>
