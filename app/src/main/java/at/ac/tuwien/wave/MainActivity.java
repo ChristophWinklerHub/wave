@@ -7,11 +7,10 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.vosk.android.StorageService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView resultText;
     private TextView debugText;
     private boolean permissionIsGranted;
+    private boolean isAndroidRecording;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         resultText = findViewById(R.id.ResultText);
         debugText = findViewById(R.id.DebugText);
+        isAndroidRecording = false;
 
         checkPermission();
 
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupSystems() {
         vosk = new Vosk(this, resultText, debugText);
         wav2Vec2 = new Wav2Vec2(this, resultText, debugText);
-        deepspeech = new Deepspeech(this, resultText);
+        deepspeech = new Deepspeech(this, resultText, debugText);
         androidSTT = new AndroidSTT(this, resultText, debugText);
     }
 
@@ -95,14 +96,19 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.DeepspeechRec).setOnClickListener(v -> {
             if (permissionIsGranted) {
-                resultText.setText("Not implemented yet!");
+                deepspeech.recognizeMicrophone();
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
             }
         });
         findViewById(R.id.AndroidRec).setOnClickListener(v -> {
             if (permissionIsGranted) {
-                androidSTT.recognizeMicrophone();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    androidSTT.recognizeMicrophone(isAndroidRecording);
+                    isAndroidRecording = !isAndroidRecording;
+                } else {
+                    resultText.setText(R.string.Android_API_less_then_8);
+                }
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
             }
@@ -157,5 +163,37 @@ public class MainActivity extends AppCompatActivity {
                 permissionIsDenied(false);
             }
         }
+    }
+
+    /**
+     * Disables all buttons except for the one that was pressed.
+     *
+     * @Author: Christoph Winkler
+     */
+    public void disableOtherUIButtons(int ButtonID) {
+        if (ButtonID != findViewById(R.id.DeepspeechRec).getId()) {
+            findViewById(R.id.DeepspeechRec).setEnabled(false);
+        }
+        if (ButtonID != findViewById(R.id.VoskRec).getId()) {
+            findViewById(R.id.VoskRec).setEnabled(false);
+        }
+        if (ButtonID != findViewById(R.id.Wav2vec2Rec).getId()) {
+            findViewById(R.id.Wav2vec2Rec).setEnabled(false);
+        }
+        if (ButtonID != findViewById(R.id.AndroidRec).getId()) {
+            findViewById(R.id.AndroidRec).setEnabled(false);
+        }
+    }
+
+    /**
+     * Enables all buttons.
+     *
+     * @Author: Christoph Winkler
+     */
+    public void enableAllUIButtons() {
+        findViewById(R.id.DeepspeechRec).setEnabled(true);
+        findViewById(R.id.VoskRec).setEnabled(true);
+        findViewById(R.id.Wav2vec2Rec).setEnabled(true);
+        findViewById(R.id.AndroidRec).setEnabled(true);
     }
 }

@@ -22,6 +22,7 @@ import java.io.IOException;
 public class Vosk implements RecognitionListener {
 
     private final Context context;
+    private final MainActivity mainActivity;
     private final TextView resultText;
     private final TextView debugText;
     private Model model;
@@ -29,8 +30,9 @@ public class Vosk implements RecognitionListener {
     private SpeechStreamService speechStreamService; // for file input
     private String partialSentence, sentences;
 
-    public Vosk(Context context, TextView resultText, TextView debugText) {
+    public Vosk(MainActivity context, TextView resultText, TextView debugText) {
         this.context = context;
+        this.mainActivity = context;
         this.resultText = resultText;
         this.debugText = debugText;
 
@@ -47,7 +49,7 @@ public class Vosk implements RecognitionListener {
      */
     @Override
     public void onPartialResult(String s) {
-        if (s.length() > 0) {
+        if (s != null && s.length() > 17) {
             partialSentence = sentences + s.substring(17, s.length() - 3) + " ";
             resultText.setText(partialSentence);
         }
@@ -60,7 +62,7 @@ public class Vosk implements RecognitionListener {
      */
     @Override
     public void onResult(String s) {
-        if (s.length() > 0) {
+        if (s != null && s.length() >= 15) {
             sentences += Character.toUpperCase(s.charAt(14)) + s.substring(15, s.length() - 3) + ". ";
             resultText.setText(sentences);
         }
@@ -75,7 +77,6 @@ public class Vosk implements RecognitionListener {
     @Override
     public void onFinalResult(String s) {
         resultText.setText(sentences);
-        //setUiState(STATE_DONE);
         if (speechStreamService != null) {
             speechStreamService = null;
         }
@@ -117,8 +118,10 @@ public class Vosk implements RecognitionListener {
             speechService.stop();
             speechService = null;
             debugText.setText(R.string.DebugText_default);
+            mainActivity.enableAllUIButtons();
         } else {
             try {
+                mainActivity.disableOtherUIButtons(R.id.VoskRec);
                 debugText.setText(R.string.Vosk_listening);
                 sentences = "";
                 Recognizer rec = new Recognizer(model, 16000.0f);
@@ -157,7 +160,6 @@ public class Vosk implements RecognitionListener {
         StorageService.unpack(context, "model-en-us", "model",
                 (model) -> {
                     this.model = model;
-                    //setUiState(STATE_READY);
                 },
                 (exception) -> resultText.setText(exception.getMessage()));
     }

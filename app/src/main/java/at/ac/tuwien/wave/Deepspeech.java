@@ -5,8 +5,21 @@ import android.widget.TextView;
 
 public class Deepspeech {
 
-    public Deepspeech (Context context, TextView resultText) {
+    Context context;
+    MainActivity mainActivity;
+    TextView resultText;
+    TextView debugText;
 
+    public Deepspeech(MainActivity context, TextView resultText, TextView debugText) {
+        this.context = context;
+        this.mainActivity = context;
+        this.resultText = resultText;
+        this.debugText = debugText;
+    }
+
+    public void recognizeMicrophone() {
+        String temp = "Not Implemented Yet!";
+        resultText.setText(temp);
     }
 
 }

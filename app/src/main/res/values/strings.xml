@@ -10,4 +10,5 @@
     <string name="DebugText_Recognizing">Recognizing…</string>
     <string name="Android_listening">"Android is listening…"</string>
     <string name="Wav2vec2_error">Audio Record cannot initialize!</string>
+    <string name="Android_API_less_then_8">Android\'s speech to text functionality requires API Level 8 to work properly.</string>
 </resources>

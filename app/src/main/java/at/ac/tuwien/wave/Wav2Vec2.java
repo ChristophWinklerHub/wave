@@ -32,6 +32,7 @@ import java.util.Locale;
 public class Wav2Vec2 extends Activity implements Runnable {
 
     private final Context context;
+    private final MainActivity mainActivity;
     private final TextView resultText;
     private final TextView debugText;
     private Module mModuleEncoder;
@@ -56,8 +57,9 @@ public class Wav2Vec2 extends Activity implements Runnable {
         }
     };
 
-    public Wav2Vec2(Context context, TextView resultText, TextView debugText) {
+    public Wav2Vec2(MainActivity context, TextView resultText, TextView debugText) {
         this.context = context;
+        this.mainActivity = context;
         this.resultText = resultText;
         this.debugText = debugText;
     }
@@ -70,6 +72,7 @@ public class Wav2Vec2 extends Activity implements Runnable {
      * @Source: <a href="https://github.com/pytorch/android-demo-app/tree/master/SpeechRecognition">wav2vec2 on Github</a> (2021-10-31)
      */
     protected void recognizeMicrophone() {
+        mainActivity.disableOtherUIButtons(R.id.Wav2vec2Rec);
         debugText.setText(String.format(Locale.US, "Wav2Vec2 is listening - %ds left", AUDIO_LEN_IN_SECOND));
 
         Thread thread = new Thread(Wav2Vec2.this);
@@ -228,11 +231,17 @@ public class Wav2Vec2 extends Activity implements Runnable {
      * @Author: Christoph Winkler
      */
     private void showTranslationResult(String result) {
-        result = result.charAt(0) + result.substring(1, result.length() - 1).toLowerCase() + ".";
+        if (result != null && result.length() > 1) {
+            result = result.charAt(0) + result.substring(1, result.length() - 1).toLowerCase() + ".";
+        } else {
+            result = "";
+        }
+
         String finalResult = result;
         runOnUiThread(() -> resultText.setText(finalResult));
 
         runOnUiThread(() -> debugText.setText(R.string.DebugText_default));
+        runOnUiThread(mainActivity::enableAllUIButtons);
     }
 
 }
