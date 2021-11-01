@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView debugText;
     private boolean permissionIsGranted;
     private boolean isAndroidRecording;
+    private boolean shallWav2Vec2StartNewRecording;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         resultText = findViewById(R.id.ResultText);
         debugText = findViewById(R.id.DebugText);
         isAndroidRecording = false;
+        shallWav2Vec2StartNewRecording = true;
 
         checkPermission();
 
@@ -89,7 +91,11 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.Wav2vec2Rec).setOnClickListener(v -> {
             if (permissionIsGranted) {
-                wav2Vec2.recognizeMicrophone();
+                wav2Vec2.startNewRecording(shallWav2Vec2StartNewRecording);
+                if(shallWav2Vec2StartNewRecording) {
+                    wav2Vec2.recognizeMicrophone();
+                }
+                shallWav2Vec2StartNewRecording = !shallWav2Vec2StartNewRecording;
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
             }

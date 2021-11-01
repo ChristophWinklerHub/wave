@@ -158,9 +158,7 @@ public class Vosk implements RecognitionListener {
      */
     void initModel() {
         StorageService.unpack(context, "model-en-us", "model",
-                (model) -> {
-                    this.model = model;
-                },
+                (model) -> this.model = model,
                 (exception) -> resultText.setText(exception.getMessage()));
     }
 }

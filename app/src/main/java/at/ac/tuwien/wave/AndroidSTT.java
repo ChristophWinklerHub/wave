@@ -46,7 +46,7 @@ public class AndroidSTT implements RecognitionListener {
         // https://github.com/pbakondy/cordova-plugin-speechrecognition/issues/39#issuecomment-377675495
         audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         restore_volume = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM);
-        audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_MUTE, 0);
+        //audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_MUTE, 0); // TODO: Add "change do not disturb" permission!
 
         // The speechRecognizerIntent was partially inspired by GeeksForGeeks.
         this.speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
