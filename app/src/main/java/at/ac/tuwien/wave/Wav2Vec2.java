@@ -7,7 +7,6 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.util.Log;
 import android.widget.TextView;
 
 import org.pytorch.IValue;
@@ -41,8 +40,6 @@ public class Wav2Vec2 extends Activity implements Runnable {
     private final static int SAMPLE_RATE = 16000;
     private final static int RECORDING_LENGTH = SAMPLE_RATE * AUDIO_LEN_IN_SECOND;
 
-    private final static String LOG_TAG = MainActivity.class.getSimpleName();
-
     private int mStart = 1;
     private HandlerThread mTimerThread;
     private Handler mTimerHandler;
@@ -53,7 +50,7 @@ public class Wav2Vec2 extends Activity implements Runnable {
 
             Wav2Vec2.this.runOnUiThread(
                     () -> {
-                        debugText.setText(String.format(Locale.US,"Listening - %ds left", AUDIO_LEN_IN_SECOND - mStart));
+                        debugText.setText(String.format(Locale.US, "Wav2Vec2 is listening - %ds left", AUDIO_LEN_IN_SECOND - mStart));
                         mStart += 1;
                     });
         }
@@ -73,7 +70,7 @@ public class Wav2Vec2 extends Activity implements Runnable {
      * @Source: <a href="https://github.com/pytorch/android-demo-app/tree/master/SpeechRecognition">wav2vec2 on Github</a> (2021-10-31)
      */
     protected void recognizeMicrophone() {
-        debugText.setText(String.format(Locale.US,"Listening - %ds left", AUDIO_LEN_IN_SECOND));
+        debugText.setText(String.format(Locale.US, "Wav2Vec2 is listening - %ds left", AUDIO_LEN_IN_SECOND));
 
         Thread thread = new Thread(Wav2Vec2.this);
         thread.start();
@@ -94,6 +91,15 @@ public class Wav2Vec2 extends Activity implements Runnable {
     protected void onDestroy() {
         super.onDestroy();
 
+        stopTimerThread();
+    }
+
+    /**
+     * Destroy method that can be called from the MainActivity.
+     *
+     * @Author: Christoph Winkler
+     */
+    protected void destroy() {
         stopTimerThread();
     }
 
@@ -129,7 +135,7 @@ public class Wav2Vec2 extends Activity implements Runnable {
                 bufferSize);
 
         if (record.getState() != AudioRecord.STATE_INITIALIZED) {
-            Log.e(LOG_TAG, "Audio Record can't initialize!");
+            resultText.setText(R.string.Wav2vec2_error);
             return;
         }
         record.startRecording();

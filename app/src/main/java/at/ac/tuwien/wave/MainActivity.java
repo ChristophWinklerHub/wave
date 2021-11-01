@@ -6,11 +6,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private void permissionIsGranted() {
         permissionIsGranted = true;
         resultText.setHint(R.string.RecResult_default);
-        setupSystems(resultText);
+        setupSystems();
     }
 
     /**
@@ -69,11 +66,11 @@ public class MainActivity extends AppCompatActivity {
      *
      * @Author: Christoph Winkler
      */
-    private void setupSystems(TextView resultText) {
-        vosk = new Vosk(this, resultText);
+    private void setupSystems() {
+        vosk = new Vosk(this, resultText, debugText);
         wav2Vec2 = new Wav2Vec2(this, resultText, debugText);
         deepspeech = new Deepspeech(this, resultText);
-        androidSTT = new AndroidSTT(this, resultText);
+        androidSTT = new AndroidSTT(this, resultText, debugText);
     }
 
     /**
@@ -85,11 +82,6 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.VoskRec).setOnClickListener(v -> {
             if (permissionIsGranted) {
                 vosk.recognizeMicrophone();
-                if(vosk.isRecording()) {
-                    debugText.setText(R.string.Vosk_listening);
-                } else {
-                    debugText.setText(R.string.DebugText_default);
-                }
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
             }
@@ -103,14 +95,14 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.DeepspeechRec).setOnClickListener(v -> {
             if (permissionIsGranted) {
-                // record Audio and print to ResultView
+                resultText.setText("Not implemented yet!");
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
             }
         });
         findViewById(R.id.AndroidRec).setOnClickListener(v -> {
             if (permissionIsGranted) {
-                // record Audio and print to ResultView
+                androidSTT.recognizeMicrophone();
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
             }
@@ -126,7 +118,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        vosk.onDestroy();
+        vosk.destroy();
+        wav2Vec2.destroy();
+        androidSTT.destroy();
     }
 
     /**

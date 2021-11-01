@@ -8,4 +8,6 @@
     <string name="DebugText_default">Click a button to activate a system…</string>
     <string name="Vosk_listening">Vosk is listening…</string>
     <string name="DebugText_Recognizing">Recognizing…</string>
+    <string name="Android_listening">"Android is listening…"</string>
+    <string name="Wav2vec2_error">Audio Record cannot initialize!</string>
 </resources>

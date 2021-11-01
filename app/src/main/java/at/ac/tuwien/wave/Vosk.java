@@ -23,28 +23,21 @@ public class Vosk implements RecognitionListener {
 
     private final Context context;
     private final TextView resultText;
+    private final TextView debugText;
     private Model model;
     private SpeechService speechService; // for microphone input
     private SpeechStreamService speechStreamService; // for file input
     private String partialSentence, sentences;
 
-    public Vosk(Context context, TextView resultText) {
+    public Vosk(Context context, TextView resultText, TextView debugText) {
         this.context = context;
         this.resultText = resultText;
+        this.debugText = debugText;
 
         partialSentence = "";
         sentences = "";
 
         initModel();
-    }
-
-    /**
-     * Returns true if recording is in progress, false otherwise.
-     *
-     * @Author: Christoph Winkler
-     */
-    public boolean isRecording() {
-        return speechService != null;
     }
 
     /**
@@ -67,7 +60,7 @@ public class Vosk implements RecognitionListener {
      */
     @Override
     public void onResult(String s) {
-        if (s.length() > 0){
+        if (s.length() > 0) {
             sentences += Character.toUpperCase(s.charAt(14)) + s.substring(15, s.length() - 3) + ". ";
             resultText.setText(sentences);
         }
@@ -107,7 +100,10 @@ public class Vosk implements RecognitionListener {
      */
     @Override
     public void onTimeout() {
-
+        resultText.setText(sentences);
+        if (speechStreamService != null) {
+            speechStreamService = null;
+        }
     }
 
     /**
@@ -118,12 +114,12 @@ public class Vosk implements RecognitionListener {
      */
     public void recognizeMicrophone() {
         if (speechService != null) {
-            //setUiState(STATE_DONE);
             speechService.stop();
             speechService = null;
+            debugText.setText(R.string.DebugText_default);
         } else {
-            //setUiState(STATE_MIC);
             try {
+                debugText.setText(R.string.Vosk_listening);
                 sentences = "";
                 Recognizer rec = new Recognizer(model, 16000.0f);
                 speechService = new SpeechService(rec, 16000.0f);
@@ -140,7 +136,7 @@ public class Vosk implements RecognitionListener {
      * @Author: Team at Vosk
      * @Source: @Source: <a href="https://github.com/alphacep/vosk-android-demo">vosk-android-demo on Github</a> (2021-10-29)
      */
-    public void onDestroy() {
+    public void destroy() {
         if (speechService != null) {
             speechService.stop();
             speechService.shutdown();
