@@ -19,6 +19,9 @@ allprojects {
         maven {
             url 'https://alphacephei.com/maven/'
         }
+        maven {
+            url 'https://maven.mozilla.org/maven2'
+        }
     }
 }
 

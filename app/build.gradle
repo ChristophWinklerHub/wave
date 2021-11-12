@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "at.ac.tuwien.wave"
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -39,4 +39,12 @@ dependencies {
     implementation 'net.java.dev.jna:jna:5.9.0@aar'
     implementation project(':models')
     implementation 'org.pytorch:pytorch_android_lite:1.9.0'
+
+    implementation project(':mozillaspeechlibrary')
+    implementation project(':mozillaspeechutils')
+    implementation 'com.loopj.android:android-async-http:1.4.9'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.annotation:annotation:1.3.0'
+    implementation 'com.jjoe64:graphview:4.2.2'
+    implementation 'net.lingala.zip4j:zip4j:1.3.2'
 }

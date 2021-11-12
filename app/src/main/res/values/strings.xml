@@ -11,4 +11,6 @@
     <string name="Android_listening">"Android is listening…"</string>
     <string name="Wav2vec2_error">Audio Record cannot initialize!</string>
     <string name="Android_API_less_then_8">Android\'s speech to text functionality requires API Level 8 to work properly.</string>
+    <string name="DeepSpeechErrorFileDeleteFail">Failed to delete file!</string>
+    <string name="DeepSpeechModelIsReady">Model is ready! + "\n"</string>
 </resources>

@@ -13,6 +13,8 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/models" />
+            <option value="$PROJECT_DIR$/mozillaspeechlibrary" />
+            <option value="$PROJECT_DIR$/mozillaspeechutils" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

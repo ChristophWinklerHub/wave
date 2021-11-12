@@ -3,7 +3,6 @@ package at.ac.tuwien.wave;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -12,9 +11,13 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
-    private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
+    private static final int PERMISSIONS_REQUEST_CODE = 1;
+    private final List<String> permissions = new ArrayList<>();
 
     private Vosk vosk;
     private Wav2Vec2 wav2Vec2;
@@ -24,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView debugText;
     private boolean permissionIsGranted;
     private boolean isAndroidRecording;
-    private boolean shallWav2Vec2StartNewRecording;
+    private boolean isDeepspeechRecording;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         resultText = findViewById(R.id.ResultText);
         debugText = findViewById(R.id.DebugText);
         isAndroidRecording = false;
-        shallWav2Vec2StartNewRecording = true;
+        isDeepspeechRecording = false;
 
         checkPermission();
 
@@ -50,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         if (!firstAsking)
             Toast.makeText(this, "Wave must have permission to access the microphone.", Toast.LENGTH_LONG).show();
         if (firstAsking)
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
+            ActivityCompat.requestPermissions(this, permissions.toArray(new String[0]), PERMISSIONS_REQUEST_CODE);
     }
 
     /**
@@ -86,25 +89,22 @@ public class MainActivity extends AppCompatActivity {
             if (permissionIsGranted) {
                 vosk.recognizeMicrophone();
             } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
+                permissionIsDenied(true);
             }
         });
         findViewById(R.id.Wav2vec2Rec).setOnClickListener(v -> {
             if (permissionIsGranted) {
-                wav2Vec2.startNewRecording(shallWav2Vec2StartNewRecording);
-                if(shallWav2Vec2StartNewRecording) {
-                    wav2Vec2.recognizeMicrophone();
-                }
-                shallWav2Vec2StartNewRecording = !shallWav2Vec2StartNewRecording;
+                wav2Vec2.recognizeMicrophone();
             } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
+                permissionIsDenied(true);
             }
         });
         findViewById(R.id.DeepspeechRec).setOnClickListener(v -> {
             if (permissionIsGranted) {
-                deepspeech.recognizeMicrophone();
+                deepspeech.recognizeMicrophone(isDeepspeechRecording);
+                isDeepspeechRecording = !isDeepspeechRecording;
             } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
+                permissionIsDenied(true);
             }
         });
         findViewById(R.id.AndroidRec).setOnClickListener(v -> {
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                     resultText.setText(R.string.Android_API_less_then_8);
                 }
             } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
+                permissionIsDenied(true);
             }
         });
     }
@@ -139,16 +139,20 @@ public class MainActivity extends AppCompatActivity {
      * Initial permission-to-record-audio check. If it's not given yet, a new request will be issued
      * for which the onRequestPermissionResult will listen.
      *
-     * @Author: Team at Vosk
-     * @Source: @Source: <a href="https://github.com/alphacep/vosk-android-demo">vosk-android-demo on Github</a> (2021-10-29)
+     * @Author: Team at Deepspeech
+     * @Source: @Source: <a href="https://github.com/mozilla/androidspeech">androidSpeech on Github</a> (2021-11-12)
      */
     private void checkPermission() {
-        // Check if user has given permission to record audio, init the model after permission is granted
-        int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO);
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            permissionIsGranted();
-        } else {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.RECORD_AUDIO);
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (permissions.size() > 0) {
             permissionIsDenied(true);
+        } else {
+            permissionIsGranted();
         }
     }
 
@@ -156,17 +160,25 @@ public class MainActivity extends AppCompatActivity {
      * Callback to the result of the permission request. If permission is given, the models are get
      * set up, if not, a text explaining how to give permission manually is being displayed.
      *
-     * @Author: Team at Vosk
-     * @Source: @Source: <a href="https://github.com/alphacep/vosk-android-demo">vosk-android-demo on Github</a> (2021-10-29)
+     * @Author: Christoph Winkler
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSIONS_REQUEST_RECORD_AUDIO) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                permissionIsGranted();
-            } else {
-                permissionIsDenied(false);
+        if (requestCode == PERMISSIONS_REQUEST_CODE) {
+            if (grantResults.length > 0) {
+                boolean allPermissionsGiven = true;
+                for (int e : grantResults) {
+                    if (e != PackageManager.PERMISSION_GRANTED) {
+                        allPermissionsGiven = false;
+                        break;
+                    }
+                }
+                if (allPermissionsGiven) {
+                    permissionIsGranted();
+                } else {
+                    permissionIsDenied(false);
+                }
             }
         }
     }

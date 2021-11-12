@@ -1,2 +1,2 @@
-include ':app', ':models'
+include ':app', ':models', ':mozillaspeechlibrary', ':mozillaspeechutils'
 rootProject.name = "wave"

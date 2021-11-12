@@ -36,9 +36,8 @@ public class Wav2Vec2 extends Activity implements Runnable {
     private final TextView resultText;
     private final TextView debugText;
     private Module mModuleEncoder;
-    private boolean shallStartNewRecording;
 
-    private final static int AUDIO_LEN_IN_SECOND = 5;
+    private final static int AUDIO_LEN_IN_SECOND = 30;
     private final static int SAMPLE_RATE = 16000;
     private final static int RECORDING_LENGTH = SAMPLE_RATE * AUDIO_LEN_IN_SECOND;
 
@@ -65,12 +64,8 @@ public class Wav2Vec2 extends Activity implements Runnable {
         this.debugText = debugText;
     }
 
-    public void startNewRecording(boolean startNewRecording) {
-        shallStartNewRecording = startNewRecording;
-    }
-
     /**
-     * This starts the microphone recording process:
+     * This starts the microphone recording process.
      *
      * @Author: Christoph Winkler
      * @Author: Team at Wav2Vec 2.0
@@ -247,10 +242,6 @@ public class Wav2Vec2 extends Activity implements Runnable {
 
         runOnUiThread(() -> debugText.setText(R.string.DebugText_default));
         runOnUiThread(mainActivity::enableAllUIButtons);
-
-        if(shallStartNewRecording) {
-            runOnUiThread(this::recognizeMicrophone);
-        }
     }
 
 }
