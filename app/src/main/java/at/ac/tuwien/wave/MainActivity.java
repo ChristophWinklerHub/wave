@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean permissionIsGranted;
     private boolean isAndroidRecording;
     private boolean isDeepspeechRecording;
+    private WordSequenceAligner werEval;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         debugText = findViewById(R.id.DebugText);
         isAndroidRecording = false;
         isDeepspeechRecording = false;
+        werEval = new WordSequenceAligner();
 
         checkPermission();
 
@@ -118,6 +120,13 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 permissionIsDenied(true);
             }
+        });
+        findViewById(R.id.clear).setOnClickListener(v -> {
+            resultText.setText("");
+        });
+        findViewById(R.id.wer).setOnClickListener(v -> {
+            String wer = "\nWER: " + calcWER(resultText.getText().toString());
+            resultText.append(wer);
         });
     }
 
@@ -201,6 +210,12 @@ public class MainActivity extends AppCompatActivity {
         if (ButtonID != findViewById(R.id.AndroidRec).getId()) {
             findViewById(R.id.AndroidRec).setEnabled(false);
         }
+        if (ButtonID != findViewById(R.id.clear).getId()) {
+            findViewById(R.id.clear).setEnabled(false);
+        }
+        if (ButtonID != findViewById(R.id.wer).getId()) {
+            findViewById(R.id.wer).setEnabled(false);
+        }
     }
 
     /**
@@ -213,5 +228,29 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.VoskRec).setEnabled(true);
         findViewById(R.id.Wav2vec2Rec).setEnabled(true);
         findViewById(R.id.AndroidRec).setEnabled(true);
+        findViewById(R.id.clear).setEnabled(true);
+        findViewById(R.id.wer).setEnabled(true);
+    }
+
+    /**
+     * Calculates the Word-Error-Rate using the WordSequenceAligner class by Brian Romanowski.
+     *
+     * @Author: Christoph Winkler
+     * @Author: Brian Romanowski
+     * @Source: @Source: <a href="https://github.com/romanows/WordSequenceAligner">WordSequenceAligner on Github</a> (2021-11-18)
+     */
+    public float calcWER(String input) {
+        String groundTruth = "the quick brown fox jumps over the lazy dog the dog yawned and " +
+                "catherine baked a cake for yelena's boston shake off car honks sounded um " +
+                "through the green glassed window miss mississippi missed my message by a " +
+                "minute the plane flew under the bridge but the ship sailed through the sand";
+
+        input = input.toLowerCase().replace(".", "");
+
+        String[] ref = groundTruth.split(" ");
+        String[] hyp = input.split(" ");
+        WordSequenceAligner.Alignment a = werEval.align(ref, hyp);
+
+        return ((float) (a.numSubstitutions + a.numInsertions + a.numDeletions)) / (float) a.getReferenceLength();
     }
 }

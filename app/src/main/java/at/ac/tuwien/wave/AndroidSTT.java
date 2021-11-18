@@ -2,7 +2,6 @@ package at.ac.tuwien.wave;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -29,8 +28,6 @@ public class AndroidSTT implements RecognitionListener {
     private final TextView debugText;
     private SpeechRecognizer speechRecognizer;
     private final Intent speechRecognizerIntent;
-    private final AudioManager audioManager;
-    private final int restore_volume;
     private String sentences;
     private String partialSentence;
 
@@ -41,12 +38,6 @@ public class AndroidSTT implements RecognitionListener {
         this.debugText = debugText;
         this.sentences = "";
         this.partialSentence = "";
-
-        // Muting the Recognition Speaker Noise was inspired by this comment on Github:
-        // https://github.com/pbakondy/cordova-plugin-speechrecognition/issues/39#issuecomment-377675495
-        audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        restore_volume = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM);
-        //audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_MUTE, 0); // TODO: Add "change do not disturb" permission!
 
         // The speechRecognizerIntent was partially inspired by GeeksForGeeks.
         this.speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -77,7 +68,6 @@ public class AndroidSTT implements RecognitionListener {
         } else {
             debugText.setText(R.string.DebugText_default);
             speechRecognizer.stopListening();
-            audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, restore_volume, 0);
             mainActivity.enableAllUIButtons();
             destroy();
         }

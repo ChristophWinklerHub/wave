@@ -50,6 +50,28 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/Wav2vec2Rec" />
 
+    <Button
+        android:id="@+id/clear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
+        android:text="Clear"
+        app:layout_constraintBottom_toTopOf="@+id/VoskRec"
+        app:layout_constraintEnd_toStartOf="@+id/wer"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/wer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
+        android:text="calc wer"
+        app:layout_constraintBottom_toTopOf="@+id/DeepspeechRec"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/clear" />
+
     <TextView
         android:id="@+id/ResultText"
         android:layout_width="275dp"
@@ -58,6 +80,7 @@
         android:layout_marginBottom="10dp"
         android:hint="@string/RecResult_default"
         android:scrollbars="vertical"
+        android:textIsSelectable="true"
         app:layout_constraintBottom_toTopOf="@+id/DebugText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -70,9 +93,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:hint="@string/DebugText_default"
-        app:layout_constraintBottom_toTopOf="@+id/VoskRec"
+        app:layout_constraintBottom_toTopOf="@+id/clear"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
