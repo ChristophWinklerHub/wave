@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,8 +28,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView resultText;
     private TextView debugText;
     private boolean permissionIsGranted;
-    private boolean isAndroidRecording;
-    private boolean isDeepspeechRecording;
     private WordSequenceAligner werEval;
 
     @Override
@@ -36,8 +36,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         resultText = findViewById(R.id.ResultText);
         debugText = findViewById(R.id.DebugText);
-        isAndroidRecording = false;
-        isDeepspeechRecording = false;
         werEval = new WordSequenceAligner();
 
         checkPermission();
@@ -103,8 +101,7 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.DeepspeechRec).setOnClickListener(v -> {
             if (permissionIsGranted) {
-                deepspeech.recognizeMicrophone(isDeepspeechRecording);
-                isDeepspeechRecording = !isDeepspeechRecording;
+                deepspeech.recognizeMicrophone();
             } else {
                 permissionIsDenied(true);
             }
@@ -112,8 +109,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.AndroidRec).setOnClickListener(v -> {
             if (permissionIsGranted) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    androidSTT.recognizeMicrophone(isAndroidRecording);
-                    isAndroidRecording = !isAndroidRecording;
+                    androidSTT.recognizeMicrophone();
                 } else {
                     resultText.setText(R.string.Android_API_less_then_8);
                 }
@@ -123,10 +119,20 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.clear).setOnClickListener(v -> {
             resultText.setText("");
+            debugText.setText("");
+            androidSTT.setSentences("");
+            deepspeech.setSentences("");
+
         });
         findViewById(R.id.wer).setOnClickListener(v -> {
             String wer = "\nWER: " + calcWER(resultText.getText().toString());
             resultText.append(wer);
+        });
+        findViewById(R.id.ResultText).setOnClickListener(v -> {
+            ClipboardManager manager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            ClipData clipData = ClipData.newPlainText("text", resultText.getText());
+            manager.setPrimaryClip(clipData);
+            Toast.makeText(this, "Copied!", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -241,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public float calcWER(String input) {
         String groundTruth = "the quick brown fox jumps over the lazy dog the dog yawned and " +
-                "catherine baked a cake for yelena's boston shake off car honks sounded um " +
+                "catherine baked a cake for yelena's boston shake off car honks sounded " +
                 "through the green glassed window miss mississippi missed my message by a " +
                 "minute the plane flew under the bridge but the ship sailed through the sand";
 

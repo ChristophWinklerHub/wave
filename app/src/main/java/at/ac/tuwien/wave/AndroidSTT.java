@@ -54,23 +54,16 @@ public class AndroidSTT implements RecognitionListener {
      *
      * @Author: Christoph Winkler
      */
-    public void recognizeMicrophone(boolean isRecording) {
-        if (!isRecording) {
-            mainActivity.disableOtherUIButtons(R.id.AndroidRec);
-            debugText.setText(R.string.Android_listening);
+    public void recognizeMicrophone() {
+        mainActivity.disableOtherUIButtons(R.id.AndroidRec);
+        debugText.setText(R.string.Android_listening);
 
-            if (speechRecognizer == null) {
-                this.speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context);
-            }
-
-            speechRecognizer.setRecognitionListener(this);
-            speechRecognizer.startListening(speechRecognizerIntent);
-        } else {
-            debugText.setText(R.string.DebugText_default);
-            speechRecognizer.stopListening();
-            mainActivity.enableAllUIButtons();
-            destroy();
+        if (speechRecognizer == null) {
+            this.speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context);
         }
+
+        speechRecognizer.setRecognitionListener(this);
+        speechRecognizer.startListening(speechRecognizerIntent);
     }
 
     /**
@@ -131,8 +124,8 @@ public class AndroidSTT implements RecognitionListener {
             result = Character.toUpperCase(result.charAt(0)) + result.substring(1) + ". ";
             sentences += result;
             resultText.setText(sentences);
+            endService();
         }
-        recognizeMicrophone(false);
     }
 
     /**
@@ -186,5 +179,26 @@ public class AndroidSTT implements RecognitionListener {
             default:
                 return "Error Code Unknown!";
         }
+    }
+
+    /**
+     * Ends AndroidSTT services.
+     *
+     * @Author: Christoph Winkler
+     */
+    public void endService() {
+        debugText.setText(R.string.DebugText_default);
+        speechRecognizer.stopListening();
+        mainActivity.enableAllUIButtons();
+        destroy();
+    }
+
+    /**
+     * For clearing the sentences after recording.
+     *
+     * @Author: Christoph Winkler
+     */
+    public void setSentences(String sentences) {
+        this.sentences = sentences;
     }
 }

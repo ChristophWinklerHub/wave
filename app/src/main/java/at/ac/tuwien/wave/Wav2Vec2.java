@@ -160,7 +160,6 @@ public class Wav2Vec2 extends Activity implements Runnable {
         stopTimerThread();
 
         runOnUiThread(() -> debugText.setText(R.string.DebugText_Recognizing));
-
         float[] floatInputBuffer = new float[RECORDING_LENGTH];
 
         // feed in float values between -1.0f and 1.0f by dividing the signed 16-bit inputs.
@@ -169,7 +168,6 @@ public class Wav2Vec2 extends Activity implements Runnable {
         }
 
         final String result = recognize(floatInputBuffer);
-
         showTranslationResult(result);
     }
 
@@ -243,5 +241,4 @@ public class Wav2Vec2 extends Activity implements Runnable {
         runOnUiThread(() -> debugText.setText(R.string.DebugText_default));
         runOnUiThread(mainActivity::enableAllUIButtons);
     }
-
 }

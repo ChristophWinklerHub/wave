@@ -43,12 +43,14 @@ public class Deepspeech implements SpeechResultCallback, DownloadsManager.Downlo
     private final SpeechService mSpeechService;
     private final UnzipTask mUnzip;
     private final DownloadsManager mDownloadManager;
+    private String sentences;
 
     public Deepspeech(MainActivity context, TextView resultText, TextView debugText) {
         this.context = context;
         this.mainActivity = context;
         this.resultText = resultText;
         this.debugText = debugText;
+        this.sentences = "";
 
         mSpeechService = new SpeechService(context);
         mUnzip = new UnzipTask(context);
@@ -63,49 +65,33 @@ public class Deepspeech implements SpeechResultCallback, DownloadsManager.Downlo
      * @Author: Team at Deepspeech
      * @Source: @Source: <a href="https://github.com/mozilla/androidspeech">androidSpeech on Github</a> (2021-11-12)
      */
-    public void recognizeMicrophone(boolean isRecording) {
-        if (!isRecording) {
-            mainActivity.disableOtherUIButtons(R.id.DeepspeechRec);
-            SpeechServiceSettings.Builder builder = new SpeechServiceSettings.Builder()
-                    .withLanguage(modelLanguage)
-                    .withStoreSamples(true)
-                    .withStoreTranscriptions(true)
-                    .withProductTag("product-tag")
-                    .withUseDeepSpeech(true);
+    public void recognizeMicrophone() {
+        mainActivity.disableOtherUIButtons(R.id.DeepspeechRec);
+        SpeechServiceSettings.Builder builder = new SpeechServiceSettings.Builder()
+                .withLanguage(modelLanguage)
+                .withStoreSamples(true)
+                .withStoreTranscriptions(true)
+                .withProductTag("product-tag")
+                .withUseDeepSpeech(true);
 
-            String modelPath = ModelUtils.modelPath(context, modelLanguage);
+        String modelPath = ModelUtils.modelPath(context, modelLanguage);
 
-            if (ModelUtils.isReady(modelPath)) {
-                // The model is already downloaded and unzipped
-                resultText.setText(R.string.DeepSpeechModelIsReady);
-                builder.withModelPath(modelPath);
-                mSpeechService.start(builder.build(), this);
-            } else {
-                String zipPath = ModelUtils.modelDownloadOutputPath(context, modelLanguage, STORAGE_TYPE);
-                if (new File(zipPath).exists()) {
-                    String zipOutputPath = ModelUtils.modelPath(context, modelLanguage);
-                    if (zipOutputPath != null) {
-                        mUnzip.start(zipPath, zipOutputPath);
-                    } else {
-                        resultText.append("Output model path error");
-                    }
-                } else {
-                    // The model needs to be downloaded
-                    downloadModel();
-                }
-            }
+        if (ModelUtils.isReady(modelPath)) {
+            // The model is already downloaded and unzipped
+            builder.withModelPath(modelPath);
+            mSpeechService.start(builder.build(), this);
         } else {
-            try {
-                mSpeechService.stop();
-                mDownloadManager.getDownloads().forEach(download -> {
-                    if (download.getStatus() != DownloadManager.STATUS_SUCCESSFUL) {
-                        mDownloadManager.removeDownload(download.getId(), true);
-                    }
-                });
-                mUnzip.cancel();
-                mainActivity.enableAllUIButtons();
-            } catch (Exception e) {
-                resultText.setText(e.getMessage());
+            String zipPath = ModelUtils.modelDownloadOutputPath(context, modelLanguage, STORAGE_TYPE);
+            if (new File(zipPath).exists()) {
+                String zipOutputPath = ModelUtils.modelPath(context, modelLanguage);
+                if (zipOutputPath != null) {
+                    mUnzip.start(zipPath, zipOutputPath);
+                } else {
+                    resultText.append("Output model path error");
+                }
+            } else {
+                // The model needs to be downloaded
+                downloadModel();
             }
         }
     }
@@ -159,7 +145,7 @@ public class Deepspeech implements SpeechResultCallback, DownloadsManager.Downlo
      */
     @Override
     public void onStartListen() {
-        debugText.append("Started to listen\n");
+        debugText.setText("Started to listen\n");
     }
 
     /**
@@ -170,7 +156,7 @@ public class Deepspeech implements SpeechResultCallback, DownloadsManager.Downlo
      */
     @Override
     public void onMicActivity(double fftsum) {
-        resultText.setText("Mic activity detected\n");
+
     }
 
     /**
@@ -181,7 +167,7 @@ public class Deepspeech implements SpeechResultCallback, DownloadsManager.Downlo
      */
     @Override
     public void onDecoding() {
-        debugText.append("Decoding... \n");
+        debugText.setText("Decoding... \n");
     }
 
     /**
@@ -193,8 +179,12 @@ public class Deepspeech implements SpeechResultCallback, DownloadsManager.Downlo
     @Override
     public void onSTTResult(@Nullable STTResult result) {
         if (result != null) {
-            String message = result.mTranscription.substring(0,1).toUpperCase() + result.mTranscription.substring(1) + ".";
-            resultText.setText(message);
+            String message = result.mTranscription.substring(0, 1).toUpperCase() + result.mTranscription.substring(1) + ". ";
+            sentences += message;
+            resultText.setText(sentences);
+            debugText.setText(R.string.DebugText_default);
+            endService();
+            mainActivity.enableAllUIButtons();
         }
     }
 
@@ -352,5 +342,35 @@ public class Deepspeech implements SpeechResultCallback, DownloadsManager.Downlo
                 resultText.setText(R.string.DeepSpeechErrorFileDeleteFail);
             }
         }
+    }
+
+    /**
+     * Ends Deepspeech service.
+     *
+     * @Author: Christoph Winkler
+     * @Source: @Source: <a href="https://github.com/mozilla/androidspeech">androidSpeech on Github</a> (2021-11-12)
+     */
+    public void endService() {
+        try {
+            mSpeechService.stop();
+            mDownloadManager.getDownloads().forEach(download -> {
+                if (download.getStatus() != DownloadManager.STATUS_SUCCESSFUL) {
+                    mDownloadManager.removeDownload(download.getId(), true);
+                }
+            });
+            mUnzip.cancel();
+            mainActivity.enableAllUIButtons();
+        } catch (Exception e) {
+            resultText.setText(e.getMessage());
+        }
+    }
+
+    /**
+     * For clearing the sentences after recording.
+     *
+     * @Author: Christoph Winkler
+     */
+    public void setSentences(String sentences) {
+        this.sentences = sentences;
     }
 }
